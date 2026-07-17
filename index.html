@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Список пособий от государства — Елена Кравцова</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  :root{
+    --blue:#1B4F9B;--blue2:#2563EB;--blue-lt:#EFF6FF;--blue-mid:#BFDBFE;
+    --dark:#111827;--gray:#6B7280;--white:#FFFFFF;
+    --green:#16A34A;--green-lt:#DCFCE7;
+    --red:#DC2626;--red-lt:#FEE2E2;
+    --orange:#D97706;--orange-lt:#FEF3C7;
+  }
+
+  html{scroll-behavior:smooth;}
+
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    color:var(--dark);background:#F3F4F6;line-height:1.6;
+    overflow-x:hidden;
+  }
+
+  /* ── АНИМАЦИИ ПОЯВЛЕНИЯ ── */
+  .fade-up{
+    opacity:0;transform:translateY(32px);
+    transition:opacity 0.6s ease,transform 0.6s ease;
+  }
+  .fade-up.visible{opacity:1;transform:translateY(0);}
+  .fade-up.delay-1{transition-delay:0.1s;}
+  .fade-up.delay-2{transition-delay:0.2s;}
+  .fade-up.delay-3{transition-delay:0.3s;}
+  .fade-up.delay-4{transition-delay:0.4s;}
+
+  /* ── STICKY CTA ── */
+  .sticky-cta{
+    position:fixed;bottom:24px;right:24px;z-index:999;
+    transform:translateY(80px);opacity:0;
+    transition:transform 0.4s ease,opacity 0.4s ease;
+  }
+  .sticky-cta.show{transform:translateY(0);opacity:1;}
+  .sticky-cta a{
+    display:flex;align-items:center;gap:10px;
+    background:var(--blue);color:white;text-decoration:none;
+    padding:13px 20px;border-radius:50px;font-size:14px;font-weight:700;
+    box-shadow:0 8px 32px rgba(27,79,155,0.4);
+    transition:transform 0.2s,box-shadow 0.2s;
+  }
+  .sticky-cta a:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(27,79,155,0.5);}
+  .pulse{width:9px;height:9px;background:#4ADE80;border-radius:50%;animation:pulse 2s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.6;transform:scale(1.4);}}
+
+  /* ── HERO ── */
+  .hero{
+    background:linear-gradient(140deg,#0A1F4E 0%,#1B4F9B 55%,#2563EB 100%);
+    color:white;padding:64px 24px 52px;text-align:center;
+    position:relative;overflow:hidden;
+  }
+  .hero::before{
+    content:'';position:absolute;inset:0;
+    background:radial-gradient(ellipse at 75% 15%,rgba(255,255,255,0.07) 0%,transparent 55%);
+  }
+  /* плавающие круги */
+  .hero-circle{
+    position:absolute;border-radius:50%;
+    background:rgba(255,255,255,0.04);
+    animation:float 8s ease-in-out infinite;
+  }
+  .hero-circle:nth-child(1){width:280px;height:280px;top:-80px;right:-60px;animation-delay:0s;}
+  .hero-circle:nth-child(2){width:180px;height:180px;bottom:-40px;left:-50px;animation-delay:-3s;}
+  .hero-circle:nth-child(3){width:120px;height:120px;top:40%;right:8%;animation-delay:-5s;}
+  @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-18px);}}
+
+  .hero-badge{
+    display:inline-flex;align-items:center;gap:8px;
+    background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);
+    border-radius:100px;padding:6px 16px;font-size:13px;font-weight:600;
+    letter-spacing:0.5px;text-transform:uppercase;margin-bottom:22px;
+    position:relative;animation:badgeFade 0.8s ease both;
+  }
+  @keyframes badgeFade{from{opacity:0;transform:scale(0.8);}to{opacity:1;transform:scale(1);}}
+
+  .hero h1{
+    font-size:clamp(24px,5vw,42px);font-weight:900;line-height:1.18;
+    margin-bottom:16px;position:relative;
+    animation:heroTitle 0.9s ease 0.2s both;
+  }
+  @keyframes heroTitle{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+  .hero h1 span{color:#93C5FD;}
+
+  .hero-sub{
+    font-size:15px;opacity:0.85;max-width:540px;margin:0 auto 28px;
+    position:relative;animation:heroTitle 0.9s ease 0.35s both;
+  }
+
+  /* автор */
+  .hero-author{
+    display:inline-flex;align-items:center;gap:10px;
+    background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.18);
+    border-radius:50px;padding:8px 16px 8px 8px;margin-bottom:28px;
+    animation:heroTitle 0.9s ease 0.45s both;position:relative;
+  }
+  .hero-author-avatar{
+    width:36px;height:36px;border-radius:50%;
+    background:linear-gradient(135deg,#93C5FD,#2563EB);
+    display:flex;align-items:center;justify-content:center;
+    font-size:17px;flex-shrink:0;
+  }
+  .hero-author-info{text-align:left;}
+  .hero-author-name{font-size:13px;font-weight:700;line-height:1.2;}
+  .hero-author-role{font-size:11px;opacity:0.65;}
+
+  .hero-cta{
+    display:inline-flex;align-items:center;gap:10px;
+    background:white;color:var(--blue);text-decoration:none;
+    padding:14px 26px;border-radius:14px;font-size:15px;font-weight:800;
+    box-shadow:0 4px 24px rgba(0,0,0,0.22);
+    transition:transform 0.22s,box-shadow 0.22s;
+    position:relative;animation:heroTitle 0.9s ease 0.55s both;
+  }
+  .hero-cta:hover{transform:translateY(-3px);box-shadow:0 10px 36px rgba(0,0,0,0.3);}
+
+  .hero-stats{
+    display:flex;justify-content:center;gap:28px;flex-wrap:wrap;
+    margin-top:44px;padding-top:32px;border-top:1px solid rgba(255,255,255,0.14);
+    position:relative;animation:heroTitle 0.9s ease 0.65s both;
+  }
+  .stat{text-align:center;}
+  .stat-num{font-size:26px;font-weight:900;line-height:1;}
+  .stat-label{font-size:11px;opacity:0.65;margin-top:4px;}
+
+  /* ── INTRO ── */
+  .intro-block{max-width:700px;margin:40px auto;padding:0 20px;}
+  .intro-card{
+    background:white;border-radius:20px;padding:32px;
+    box-shadow:0 2px 20px rgba(0,0,0,0.06);
+    border-left:4px solid var(--blue);
+  }
+  .intro-card h2{font-size:19px;color:var(--blue);margin-bottom:12px;font-weight:800;}
+  .intro-card p{color:var(--gray);font-size:14.5px;margin-bottom:10px;}
+  .example{
+    background:var(--blue-lt);border-radius:10px;
+    padding:11px 15px;margin:7px 0;font-size:13.5px;color:var(--dark);
+    border-left:3px solid var(--blue-mid);
+    transition:transform 0.2s;
+  }
+  .example:hover{transform:translateX(4px);}
+  .example strong{color:var(--blue);}
+
+  /* ── SECTIONS ── */
+  .section{max-width:700px;margin:0 auto 28px;padding:0 20px;}
+  .section-header{display:flex;align-items:center;gap:14px;margin-bottom:14px;}
+  .section-num{
+    width:42px;height:42px;background:var(--blue);color:white;
+    border-radius:13px;display:flex;align-items:center;justify-content:center;
+    font-size:17px;font-weight:900;flex-shrink:0;
+    box-shadow:0 4px 12px rgba(27,79,155,0.3);
+  }
+  .section-title{font-size:21px;font-weight:800;color:var(--dark);}
+  .section-card{
+    background:white;border-radius:20px;overflow:hidden;
+    box-shadow:0 2px 20px rgba(0,0,0,0.06);
+    transition:box-shadow 0.25s,transform 0.25s;
+  }
+  .section-card:hover{box-shadow:0 8px 32px rgba(0,0,0,0.1);transform:translateY(-2px);}
+
+  /* ── AMOUNT GRID ── */
+  .amount-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#E5E7EB;}
+  .amount-cell{background:white;padding:20px 12px;text-align:center;transition:background 0.2s;}
+  .amount-cell.highlight{background:var(--blue);}
+  .amount-pct{font-size:30px;font-weight:900;color:var(--blue);line-height:1;}
+  .amount-cell.highlight .amount-pct{color:white;}
+  .amount-rub{font-size:15px;font-weight:700;color:var(--dark);margin-top:5px;}
+  .amount-cell.highlight .amount-rub{color:#BFDBFE;}
+  .amount-label{font-size:11px;color:var(--gray);margin-top:3px;}
+  .amount-cell.highlight .amount-label{color:rgba(255,255,255,0.6);}
+
+  /* ── INFO ROWS ── */
+  .info-row{
+    padding:14px 22px;border-bottom:1px solid #F3F4F6;
+    display:flex;gap:12px;align-items:flex-start;
+  }
+  .info-row:last-child{border-bottom:none;}
+  .info-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--gray);min-width:88px;padding-top:1px;}
+  .info-value{font-size:13.5px;color:var(--dark);flex:1;}
+
+  /* ── CHECKLISTS ── */
+  .check-list{padding:16px 22px;display:flex;flex-direction:column;gap:9px;}
+  .check-item{display:flex;align-items:flex-start;gap:9px;font-size:13.5px;color:var(--dark);}
+  .check-icon{font-size:15px;flex-shrink:0;margin-top:1px;}
+
+  /* ── TAGS ── */
+  .tag-row{padding:14px 22px;display:flex;flex-wrap:wrap;gap:7px;}
+  .tag{
+    display:inline-flex;align-items:center;gap:5px;
+    padding:5px 11px;border-radius:100px;font-size:12.5px;font-weight:600;
+    transition:transform 0.15s;
+  }
+  .tag:hover{transform:scale(1.04);}
+  .tag.green{background:var(--green-lt);color:var(--green);}
+  .tag.red{background:var(--red-lt);color:var(--red);}
+  .tag.blue{background:var(--blue-lt);color:var(--blue);}
+  .tag.orange{background:var(--orange-lt);color:var(--orange);}
+
+  /* ── SUB LABELS ── */
+  .sub-label{
+    padding:10px 22px 5px;font-size:11px;font-weight:700;
+    text-transform:uppercase;letter-spacing:0.6px;color:var(--blue);
+    border-top:1px solid #F3F4F6;
+  }
+  .sub-label:first-child{border-top:none;}
+
+  /* ── ALERTS ── */
+  .alert{
+    margin:12px 22px;padding:11px 14px;border-radius:12px;
+    font-size:13px;display:flex;gap:9px;align-items:flex-start;
+    animation:none;
+  }
+  .alert.blue{background:var(--blue-lt);border-left:3px solid var(--blue2);}
+  .alert.orange{background:var(--orange-lt);border-left:3px solid var(--orange);}
+  .alert.red{background:var(--red-lt);border-left:3px solid var(--red);}
+  .alert-icon{font-size:15px;flex-shrink:0;}
+  .alert p{color:var(--dark);margin:0;}
+
+  /* ── MATCAP ROWS ── */
+  .matcap-grid{padding:18px 22px;display:flex;flex-direction:column;gap:9px;}
+  .matcap-row{
+    background:#F9FAFB;border-radius:12px;padding:13px 15px;
+    display:flex;justify-content:space-between;align-items:center;gap:12px;
+    transition:background 0.2s,transform 0.2s;
+  }
+  .matcap-row:hover{background:var(--blue-lt);transform:translateX(3px);}
+  .matcap-row .label{font-size:13.5px;color:var(--gray);flex:1;}
+  .matcap-row .amount{font-size:17px;font-weight:900;color:var(--blue);white-space:nowrap;}
+
+  /* ── BOTTOM CTA ── */
+  .bottom-cta{max-width:700px;margin:32px auto 90px;padding:0 20px;}
+  .bottom-cta-card{
+    background:linear-gradient(140deg,#0A1F4E,#1B4F9B);
+    border-radius:24px;padding:36px 28px;text-align:center;color:white;
+    position:relative;overflow:hidden;
+  }
+  .bottom-cta-card::before{
+    content:'';position:absolute;top:-50px;right:-50px;
+    width:220px;height:220px;background:rgba(255,255,255,0.05);border-radius:50%;
+  }
+  .bottom-cta-card::after{
+    content:'';position:absolute;bottom:-40px;left:-40px;
+    width:160px;height:160px;background:rgba(255,255,255,0.04);border-radius:50%;
+  }
+  .bottom-cta-card h2{font-size:22px;font-weight:900;margin-bottom:10px;position:relative;}
+  .bottom-cta-card p{font-size:14.5px;opacity:0.82;margin-bottom:24px;max-width:420px;margin-left:auto;margin-right:auto;position:relative;}
+  .cta-btn{
+    display:inline-flex;align-items:center;gap:10px;
+    background:white;color:var(--blue);text-decoration:none;
+    padding:14px 26px;border-radius:14px;font-size:15px;font-weight:800;
+    box-shadow:0 4px 20px rgba(0,0,0,0.2);
+    transition:transform 0.22s,box-shadow 0.22s;position:relative;
+  }
+  .cta-btn:hover{transform:translateY(-3px);box-shadow:0 10px 32px rgba(0,0,0,0.28);}
+  .cta-sub{font-size:12.5px;opacity:0.55;margin-top:14px;position:relative;}
+
+  /* ── FOOTER ── */
+  .footer{
+    text-align:center;padding:24px 20px 40px;
+    font-size:12.5px;color:var(--gray);
+  }
+  .footer a{color:var(--blue);text-decoration:none;}
+
+  /* ── PROGRESS BAR ── */
+  .progress-bar{
+    position:fixed;top:0;left:0;height:3px;
+    background:linear-gradient(90deg,var(--blue),#60A5FA);
+    z-index:1000;transition:width 0.1s linear;
+    border-radius:0 2px 2px 0;
+  }
+
+  @media(max-width:480px){
+    .amount-pct{font-size:24px;}
+    .amount-rub{font-size:13px;}
+    .hero-stats{gap:18px;}
+    .stat-num{font-size:22px;}
+    .sticky-cta a{font-size:13px;padding:11px 16px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- Прогресс-бар чтения -->
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- Фиксированная кнопка -->
+<div class="sticky-cta" id="stickyCta">
+  <a href="https://t.me/ElenaKravtsova28?text=Здравствуйте%21%20Хочу%20записаться%20на%20консультацию" target="_blank">
+    <div class="pulse"></div>
+    Записаться на консультацию
+  </a>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-circle"></div>
+  <div class="hero-circle"></div>
+  <div class="hero-circle"></div>
+
+  <div class="hero-badge">📋 POSOBIYARU · Актуально на июль 2026</div>
+
+  <div class="hero-author">
+    <div class="hero-author-avatar">⚖️</div>
+    <div class="hero-author-info">
+      <div class="hero-author-name">Елена Кравцова</div>
+      <div class="hero-author-role">Юрист по пособиям · @ElenaKravtsova28</div>
+    </div>
+  </div>
+
+  <h1>Полный список выплат,<br><span>которые вам положены</span></h1>
+  <p class="hero-sub">Собрала все основные пособия в одном месте: с суммами 2026 года, условиями получения и пояснениями о том, кому что положено</p>
+
+  <a href="https://t.me/ElenaKravtsova28?text=Здравствуйте%21%20Хочу%20записаться%20на%20консультацию" target="_blank" class="hero-cta">
+    💬 Разобрать мою ситуацию
+  </a>
+
+  <div class="hero-stats">
+    <div class="stat">
+      <div class="stat-num">7</div>
+      <div class="stat-label">видов выплат</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">350 000 ₽</div>
+      <div class="stat-label">максимум по соцконтракту</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">18 371 ₽</div>
+      <div class="stat-label">детский ПМ в 2026 году</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- INTRO -->
+<div class="intro-block fade-up">
+  <div class="intro-card">
+    <h2>Прочитайте перед тем, как листать дальше</h2>
+    <p>Система социальных выплат в России устроена сложно. Сотни пособий разбросаны по разным ведомствам: Социальный фонд, соцзащита, ФНС, региональные программы. Информация часто противоречивая, законы меняются, и в итоге семьи теряют деньги, которые им положены по закону.</p>
+    <p>Вот три реальные ситуации:</p>
+    <div class="example">Семья с двумя детьми не подаёт на единое пособие, потому что думает: «муж работает, нам не положено». На самом деле им положено около <strong>36 742 рублей в месяц</strong> на двоих детей.</div>
+    <div class="example">Мама в декрете не знает про социальный контракт и не получает <strong>350 000 рублей</strong>, которые можно направить на открытие своего дела.</div>
+    <div class="example">Многодетная семья не оформляет региональные выплаты, считая, что «там копейки». А там: <strong>100 000 рублей к школе</strong>, компенсация ЖКХ и бесплатный участок.</div>
+    <p style="margin-top:12px;">Пройдитесь по списку. Отметьте то, что может подходить вашей семье, и начните получать то, что принадлежит вам по закону.</p>
+  </div>
+</div>
+
+
+<!-- ═══ 1. ЕДИНОЕ ПОСОБИЕ ═══ -->
+<div class="section fade-up delay-1">
+  <div class="section-header">
+    <div class="section-num">1</div>
+    <div class="section-title">Единое пособие на детей</div>
+  </div>
+  <div class="section-card">
+
+    <div class="amount-grid">
+      <div class="amount-cell">
+        <div class="amount-pct">50%</div>
+        <div class="amount-rub">около 9 185 ₽</div>
+        <div class="amount-label">базовый / на ребёнка</div>
+      </div>
+      <div class="amount-cell highlight">
+        <div class="amount-pct">75%</div>
+        <div class="amount-rub">около 13 778 ₽</div>
+        <div class="amount-label">если 50% не хватает</div>
+      </div>
+      <div class="amount-cell">
+        <div class="amount-pct">100%</div>
+        <div class="amount-rub">около 18 371 ₽</div>
+        <div class="amount-label">максимум / на ребёнка</div>
+      </div>
+    </div>
+
+    <div class="alert blue" style="margin-top:0;border-radius:0;">
+      <span class="alert-icon">💡</span>
+      <p>Суммы рассчитаны от федерального прожиточного минимума на детей (18 371 рубль). В вашем регионе может быть выше: прожиточный минимум устанавливается отдельно. Если детей двое, умножайте на два.</p>
+    </div>
+
+    <div class="sub-label">Кому положено</div>
+    <div class="check-list">
+      <div class="check-item"><span class="check-icon">✅</span>Гражданам России, постоянно проживающим в стране</div>
+      <div class="check-item"><span class="check-icon">✅</span>На детей от 0 до 17 лет (до месяца исполнения 17 лет)</div>
+      <div class="check-item"><span class="check-icon">✅</span>При среднедушевом доходе семьи ниже прожиточного минимума</div>
+      <div class="check-item"><span class="check-icon">✅</span>При соблюдении имущественного ценза</div>
+      <div class="check-item"><span class="check-icon">✅</span>При соблюдении правила нулевого дохода</div>
+    </div>
+
+    <div class="sub-label">Правило нулевого дохода</div>
+    <div class="check-list">
+      <div class="check-item"><span class="check-icon">ℹ️</span>Если кто-то из взрослых членов семьи не имел официального дохода, нужна уважительная причина, которая покрывает не менее 10 из 12 месяцев расчётного периода</div>
+      <div class="check-item"><span class="check-icon">✔️</span>Уход за ребёнком до 3 лет</div>
+      <div class="check-item"><span class="check-icon">✔️</span>Уход за инвалидом или пожилым старше 80 лет</div>
+      <div class="check-item"><span class="check-icon">✔️</span>Очное обучение до 23 лет</div>
+      <div class="check-item"><span class="check-icon">✔️</span>Лечение продолжительностью более 3 месяцев</div>
+      <div class="check-item"><span class="check-icon">✔️</span>Официальная безработица (постановка на учёт в ЦЗН) до 6 месяцев</div>
+      <div class="check-item"><span class="check-icon">✔️</span>Служба в армии и ещё 3 месяца после демобилизации</div>
+      <div class="check-item"><span class="check-icon">✔️</span>Единственный родитель несовершеннолетнего ребёнка</div>
+      <div class="check-item"><span class="check-icon">✔️</span>Беременность (6 и более месяцев в расчётном периоде)</div>
+      <div class="check-item"><span class="check-icon">✔️</span>Статус многодетного для одного из родителей</div>
+    </div>
+
+    <div class="sub-label">Имущественный ценз</div>
+    <div class="tag-row">
+      <span class="tag green">✅ Квартира или несколько, если менее 24 кв. м на человека</span>
+      <span class="tag green">✅ Дом или несколько, если менее 40 кв. м на человека</span>
+      <span class="tag green">✅ Одна дача</span>
+      <span class="tag green">✅ Один гараж (два для многодетных)</span>
+      <span class="tag green">✅ Один автомобиль (два для многодетных)</span>
+      <span class="tag green">✅ Участок до 0,25 га в городе или 1 га в селе</span>
+      <span class="tag red">❌ Авто мощнее 250 л. с. возрастом менее 5 лет</span>
+      <span class="tag red">❌ Вклад с доходом более 1 прожиточного минимума в год</span>
+      <span class="tag red">❌ Два автомобиля и более без исключений</span>
+    </div>
+
+    <div class="sub-label">Как считается доход</div>
+    <div class="info-row">
+      <div class="info-label">Период</div>
+      <div class="info-value">12 месяцев, которые закончились за 1 месяц до подачи заявления</div>
+    </div>
+    <div class="info-row">
+      <div class="info-label">Учитывается</div>
+      <div class="info-value">Зарплата до вычета НДФЛ, пенсии, стипендии, алименты, доходы ИП и самозанятых, доходы от аренды, проценты по вкладам</div>
+    </div>
+    <div class="info-row">
+      <div class="info-label">Не учитывается</div>
+      <div class="info-value">Само пособие, материнский капитал, налоговые вычеты, компенсации за лекарства, целевые гранты и субсидии на бизнес</div>
+    </div>
+
+    <div class="alert orange">
+      <span class="alert-icon">⚠️</span>
+      <p><strong>Три главные причины отказа:</strong> неудачный месяц подачи, когда в расчёт попадает крупная выплата или премия; нарушение правила нулевого дохода; два автомобиля в собственности.</p>
+    </div>
+
+    <div class="sub-label">Куда подавать</div>
+    <div class="tag-row">
+      <span class="tag blue">🏛 Госуслуги</span>
+      <span class="tag blue">🏢 МФЦ</span>
+      <span class="tag blue">📍 Социальный фонд России</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ 2. СОЦКОНТРАКТ ═══ -->
+<div class="section fade-up delay-2">
+  <div class="section-header">
+    <div class="section-num">2</div>
+    <div class="section-title">Социальный контракт</div>
+  </div>
+  <div class="section-card">
+    <div class="matcap-grid">
+      <div class="matcap-row">
+        <div class="label">🏪 Открытие бизнеса (ИП или самозанятость)</div>
+        <div class="amount">до 350 000 ₽</div>
+      </div>
+      <div class="matcap-row">
+        <div class="label">🌱 Личное подсобное хозяйство</div>
+        <div class="amount">до 200 000 ₽</div>
+      </div>
+      <div class="matcap-row">
+        <div class="label">📚 Переобучение</div>
+        <div class="amount">до 30 000 ₽</div>
+      </div>
+      <div class="matcap-row">
+        <div class="label">💼 Поиск работы (единовременно)</div>
+        <div class="amount">до 30 000 ₽</div>
+      </div>
+      <div class="matcap-row">
+        <div class="label">🆘 Трудная жизненная ситуация</div>
+        <div class="amount">до 12 000 ₽/мес</div>
+      </div>
+    </div>
+
+    <div class="alert blue">
+      <span class="alert-icon">💡</span>
+      <p><strong>Это не кредит.</strong> Деньги не нужно возвращать при условии, что вы выполнили условия контракта. Конкретные суммы зависят от региона.</p>
+    </div>
+
+    <div class="sub-label">Кому положено</div>
+    <div class="check-list">
+      <div class="check-item"><span class="check-icon">✅</span>Граждане России</div>
+      <div class="check-item"><span class="check-icon">✅</span>Малоимущие семьи или одинокие граждане</div>
+      <div class="check-item"><span class="check-icon">✅</span>Среднедушевой доход ниже прожиточного минимума в регионе</div>
+      <div class="check-item"><span class="check-icon">⚠️</span>Повторно получить можно не раньше чем через 3 года</div>
+    </div>
+
+    <div class="sub-label">Куда подавать</div>
+    <div class="tag-row">
+      <span class="tag blue">🏢 Соцзащита по месту жительства</span>
+      <span class="tag blue">🏛 МФЦ</span>
+      <span class="tag blue">💻 Госуслуги (не во всех регионах)</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ 3. ВЫПЛАТА БЕРЕМЕННЫМ ═══ -->
+<div class="section fade-up delay-1">
+  <div class="section-header">
+    <div class="section-num">3</div>
+    <div class="section-title">Выплата беременным</div>
+  </div>
+  <div class="section-card">
+    <div class="info-row">
+      <div class="info-label">Размер</div>
+      <div class="info-value"><strong>50% от прожиточного минимума трудоспособного населения</strong> — около 10 322 рублей в месяц от федерального значения (20 644 рубля)</div>
+    </div>
+    <div class="info-row">
+      <div class="info-label">Период</div>
+      <div class="info-value">С месяца постановки на учёт (но не раньше 6 недель беременности) до месяца родов</div>
+    </div>
+    <div class="sub-label">Условия получения</div>
+    <div class="check-list">
+      <div class="check-item"><span class="check-icon">✅</span>Гражданка России</div>
+      <div class="check-item"><span class="check-icon">✅</span>Встала на учёт <strong>до 12 недель</strong> беременности</div>
+      <div class="check-item"><span class="check-icon">✅</span>Доход семьи ниже прожиточного минимума</div>
+      <div class="check-item"><span class="check-icon">✅</span>Соблюдение имущественного ценза и правила нулевого дохода</div>
+    </div>
+    <div class="tag-row">
+      <span class="tag blue">🏛 Госуслуги</span>
+      <span class="tag blue">📍 Социальный фонд России</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ 4. МАТЕРИНСКИЙ КАПИТАЛ ═══ -->
+<div class="section fade-up delay-2">
+  <div class="section-header">
+    <div class="section-num">4</div>
+    <div class="section-title">Материнский капитал</div>
+  </div>
+  <div class="section-card">
+    <div class="matcap-grid">
+      <div class="matcap-row">
+        <div class="label">👶 На первого ребёнка</div>
+        <div class="amount">728 921 ₽</div>
+      </div>
+      <div class="matcap-row" style="background:var(--blue-lt);">
+        <div class="label">👨‍👩‍👧‍👦 На второго ребёнка, если не получали на первого</div>
+        <div class="amount">963 243 ₽</div>
+      </div>
+      <div class="matcap-row">
+        <div class="label">➕ На второго ребёнка, если уже получали на первого</div>
+        <div class="amount">234 321 ₽</div>
+      </div>
+    </div>
+
+    <div class="alert blue">
+      <span class="alert-icon">💡</span>
+      <p>Суммы актуальны с 1 февраля 2026 года после индексации на 5,6%. Сертификат оформляется автоматически при рождении. Проверить можно на Госуслугах в разделе «Материнский капитал».</p>
+    </div>
+
+    <div class="sub-label">На что можно потратить</div>
+    <div class="check-list">
+      <div class="check-item"><span class="check-icon">🏠</span>Покупка, строительство жилья или погашение ипотеки</div>
+      <div class="check-item"><span class="check-icon">🎓</span>Образование детей: детский сад, школа, вуз, кружки</div>
+      <div class="check-item"><span class="check-icon">💰</span>Накопительная пенсия матери</div>
+      <div class="check-item"><span class="check-icon">♿</span>Товары и услуги для детей-инвалидов</div>
+      <div class="check-item"><span class="check-icon">📅</span>Ежемесячные выплаты, если доход семьи ниже двух прожиточных минимумов (пока ребёнку не исполнится 3 года)</div>
+    </div>
+
+    <div class="alert orange">
+      <span class="alert-icon">📌</span>
+      <p>Программа продлена до 31 декабря 2030 года: право на маткапитал возникает при рождении или усыновлении ребёнка до конца 2030 года.</p>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ 5. МНОГОДЕТНЫЕ ═══ -->
+<div class="section fade-up delay-1">
+  <div class="section-header">
+    <div class="section-num">5</div>
+    <div class="section-title">Выплаты многодетным семьям</div>
+  </div>
+  <div class="section-card">
+
+    <div class="sub-label">Федеральная поддержка</div>
+    <div class="matcap-grid" style="padding-top:12px;">
+      <div class="matcap-row">
+        <div class="label">🏦 Погашение ипотеки при рождении третьего и последующих детей (до 31 декабря 2030 года)</div>
+        <div class="amount">до 450 000 ₽</div>
+      </div>
+    </div>
+
+    <div class="sub-label">Налоговые льготы</div>
+    <div class="check-list">
+      <div class="check-item"><span class="check-icon">💸</span>Вычет по НДФЛ: 1 400 рублей на первого и второго ребёнка, 3 000 рублей на третьего и последующих. Это сумма, с которой не удерживается налог</div>
+      <div class="check-item"><span class="check-icon">🏘️</span>Вычет по земельному налогу: 600 кв. м не облагаются</div>
+      <div class="check-item"><span class="check-icon">🏠</span>Дополнительный вычет на имущество: плюс 5 кв. м на квартиру и 7 кв. м на дом за каждого ребёнка</div>
+    </div>
+
+    <div class="sub-label">Региональная поддержка (зависит от региона)</div>
+    <div class="tag-row">
+      <span class="tag green">💰 Региональный маткапитал: 50–200 тыс. ₽</span>
+      <span class="tag green">⚡ Компенсация ЖКХ: 30–50%</span>
+      <span class="tag green">🌳 Бесплатный земельный участок</span>
+      <span class="tag green">🎒 Выплаты к 1 сентября: 5–30 тыс. ₽</span>
+      <span class="tag green">🚌 Бесплатный проезд</span>
+      <span class="tag green">🍽️ Бесплатное питание в школе</span>
+    </div>
+
+    <div class="alert blue">
+      <span class="alert-icon">📍</span>
+      <p>Узнать, что есть в вашем регионе: Госуслуги, раздел «Льготы и выплаты», или сайт соцзащиты региона.</p>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ 6. СУБСИДИЯ ЖКХ ═══ -->
+<div class="section fade-up delay-2">
+  <div class="section-header">
+    <div class="section-num">6</div>
+    <div class="section-title">Субсидия на оплату ЖКХ</div>
+  </div>
+  <div class="section-card">
+    <div class="info-row">
+      <div class="info-label">Условие</div>
+      <div class="info-value">Расходы на ЖКХ превышают <strong>22% совокупного дохода семьи</strong>. В ряде регионов порог ниже: 10–15%</div>
+    </div>
+    <div class="info-row">
+      <div class="info-label">Размер</div>
+      <div class="info-value">Рассчитывается индивидуально. Как правило, от 500 до 5 000 рублей в месяц и выше</div>
+    </div>
+    <div class="sub-label">Кому положено</div>
+    <div class="check-list">
+      <div class="check-item"><span class="check-icon">✅</span>Собственники жилья</div>
+      <div class="check-item"><span class="check-icon">✅</span>Наниматели по договору социального или коммерческого найма</div>
+      <div class="check-item"><span class="check-icon">✅</span>Члены жилищных кооперативов</div>
+      <div class="check-item"><span class="check-icon">⚠️</span>Не должно быть задолженности по оплате ЖКХ</div>
+    </div>
+    <div class="tag-row">
+      <span class="tag blue">🏢 МФЦ</span>
+      <span class="tag blue">🏠 Соцзащита</span>
+      <span class="tag blue">🏛 Госуслуги</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ 7. ПОСОБИЕ ПО БЕЗРАБОТИЦЕ ═══ -->
+<div class="section fade-up delay-1">
+  <div class="section-header">
+    <div class="section-num">7</div>
+    <div class="section-title">Пособие по безработице</div>
+  </div>
+  <div class="section-card">
+    <div class="matcap-grid">
+      <div class="matcap-row">
+        <div class="label">💰 Максимальный размер (первые 3 месяца)</div>
+        <div class="amount">около 15 500 ₽</div>
+      </div>
+      <div class="matcap-row" style="background:var(--blue-lt);">
+        <div class="label">📉 С 4-го по 6-й месяц</div>
+        <div class="amount">около 6 200 ₽</div>
+      </div>
+      <div class="matcap-row">
+        <div class="label">🔽 Минимальный размер</div>
+        <div class="amount">около 1 800 ₽</div>
+      </div>
+    </div>
+
+    <div class="alert blue">
+      <span class="alert-icon">💡</span>
+      <p>С 2025 года индивидуальные предприниматели и самозанятые вправе претендовать на <strong>максимальный</strong> размер пособия. Выплачивается не более 6 месяцев подряд.</p>
+    </div>
+
+    <div class="sub-label">Как получить</div>
+    <div class="check-list">
+      <div class="check-item"><span class="check-icon">1️⃣</span>Зарегистрироваться на платформе «Работа России» (trudvsem.ru)</div>
+      <div class="check-item"><span class="check-icon">2️⃣</span>Встать на учёт в центр занятости населения</div>
+      <div class="check-item"><span class="check-icon">3️⃣</span>После получения статуса безработного пособие назначается автоматически</div>
+    </div>
+    <div class="tag-row">
+      <span class="tag blue">💻 trudvsem.ru</span>
+      <span class="tag blue">🏢 Центр занятости</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- BOTTOM CTA -->
+<div class="bottom-cta fade-up">
+  <div class="bottom-cta-card">
+    <h2>Узнайте, что положено именно вашей семье</h2>
+    <p>У каждой семьи своя ситуация: состав, расчётный период, нюансы с доходами. Я разберу вашу ситуацию и скажу точно, что оформлять и как.</p>
+    <a href="https://t.me/ElenaKravtsova28?text=Здравствуйте%21%20Хочу%20записаться%20на%20консультацию" target="_blank" class="cta-btn">
+      💬 Записаться на консультацию
+    </a>
+    <div class="cta-sub">Пишите в Telegram · @ElenaKravtsova28</div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <p>Составлено: <a href="https://t.me/ElenaKravtsova28" target="_blank">Елена Кравцова</a> · Юрист по пособиям · POSOBIYARU</p>
+  <p style="margin-top:6px;opacity:0.6;">Информация актуальна на июль 2026 года и носит ознакомительный характер</p>
+</div>
+
+<script>
+  // Прогресс-бар чтения
+  const bar = document.getElementById('progressBar');
+  window.addEventListener('scroll', () => {
+    const scrolled = window.scrollY;
+    const total = document.body.scrollHeight - window.innerHeight;
+    bar.style.width = Math.min(100, (scrolled / total) * 100) + '%';
+  });
+
+  // Показываем кнопку после скролла
+  const cta = document.getElementById('stickyCta');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 300) cta.classList.add('show');
+    else cta.classList.remove('show');
+  });
+
+  // Анимация появления секций
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+  // Счётчик цифр в hero
+  function animateNum(el, target, prefix, suffix, dur) {
+    const start = Date.now();
+    const step = () => {
+      const p = Math.min(1, (Date.now() - start) / dur);
+      const ease = 1 - Math.pow(1 - p, 3);
+      const val = Math.round(ease * target);
+      el.textContent = prefix + val.toLocaleString('ru-RU') + suffix;
+      if (p < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+
+  // Запускаем анимацию цифр при загрузке
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      const nums = document.querySelectorAll('.stat-num');
+      // 7 видов
+      animateNum(nums[0], 7, '', '', 800);
+      // 350 000
+      animateNum(nums[1], 350000, '', ' ₽', 1200);
+      // 18 371
+      animateNum(nums[2], 18371, '', ' ₽', 1000);
+    }, 700);
+  });
+</script>
+
+</body>
+</html>
